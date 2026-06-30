@@ -60,8 +60,8 @@ const app = new Hono<AppEnv>();
 app.use('*', cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization', 'X-Matrix-Origin'],
-  exposeHeaders: ['Content-Type', 'Content-Length'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-Matrix-Origin', 'Accept', 'X-Requested-With'],
+  exposeHeaders: ['Content-Type', 'Content-Length', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset', 'Retry-After'],
   maxAge: 86400,
 }));
 
