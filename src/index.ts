@@ -391,16 +391,13 @@ app.get('/_matrix/client/unstable/org.matrix.msc3814.v1/dehydrated_device', asyn
   }, 404);
 });
 
-// OIDC auth metadata endpoints are now handled by oidc-auth.ts
-// Legacy unstable endpoint for backwards compatibility
-app.get('/_matrix/client/unstable/org.matrix.msc2965/auth_issuer', async (c) => {
-  // Redirect to the stable endpoint implementation
-  return c.redirect('/_matrix/client/v1/auth_metadata', 307);
+// Legacy unstable OIDC endpoints - return 404 to avoid triggering OIDC flow in Element Web
+app.get('/_matrix/client/unstable/org.matrix.msc2965/auth_issuer', (c) => {
+  return c.json({ errcode: 'M_UNRECOGNIZED', error: 'Unrecognized request' }, 404);
 });
 
-app.get('/_matrix/client/unstable/org.matrix.msc2965/auth_metadata', async (c) => {
-  // Redirect to the stable endpoint implementation
-  return c.redirect('/_matrix/client/v1/auth_metadata', 307);
+app.get('/_matrix/client/unstable/org.matrix.msc2965/auth_metadata', (c) => {
+  return c.json({ errcode: 'M_UNRECOGNIZED', error: 'Unrecognized request' }, 404);
 });
 
 // Fallback for unknown endpoints

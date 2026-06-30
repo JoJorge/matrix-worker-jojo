@@ -444,48 +444,23 @@ Device ID: ${deviceId}\`;
 // GET /_matrix/client/v1/auth_metadata - Get authentication metadata
 // Returns information about supported authentication methods (MSC2965 / Matrix v1.17)
 // This is the STABLE endpoint as of Matrix v1.17
+// NOTE: OIDC fields (issuer, authorization_endpoint, etc.) are intentionally omitted
+// so that Element Web falls back to m.login.password. Element X only needs
+// account_management_uri and account_management_actions_supported.
 app.get('/_matrix/client/v1/auth_metadata', async (c) => {
   const serverName = c.env.SERVER_NAME;
   const baseUrl = `https://${serverName}`;
 
-  // Return proper OIDC metadata for this server acting as its own OIDC provider
-  // This is required for Element Web OIDC-native authentication to work
-  // All fields must be present for Element Web to accept the configuration
   const response = {
-    issuer: baseUrl,
-    authorization_endpoint: `${baseUrl}/oauth/authorize`,
-    token_endpoint: `${baseUrl}/oauth/token`,
-    revocation_endpoint: `${baseUrl}/oauth/revoke`,
-    registration_endpoint: `${baseUrl}/oauth/register`,
-    // Required capabilities
-    response_types_supported: ['code'],
-    grant_types_supported: ['authorization_code', 'refresh_token'],
-    code_challenge_methods_supported: ['S256', 'plain'],
-    // Additional optional fields that Element Web may check
-    token_endpoint_auth_methods_supported: ['client_secret_basic', 'client_secret_post', 'none'],
-    scopes_supported: [
-      'openid',
-      'profile',
-      'email',
-      'urn:matrix:org.matrix.msc2967.client:api:*',
-      'urn:matrix:org.matrix.msc2967.client:device:*',
-    ],
-    // Matrix authentication service extension (MSC3861/MSC4191)
-    // account_management_uri is where users can manage their account
+    // Account management for Element X (MSC4191)
     account_management_uri: `${baseUrl}/admin`,
-    // Supported account management actions per MSC4191
-    // Element X uses these to determine what features are available
     account_management_actions_supported: [
-      'org.matrix.profile',              // View/edit profile
-      'org.matrix.sessions_list',        // View list of sessions  
-      'org.matrix.session_view',         // View details of a specific session
-      'org.matrix.session_end',          // End/logout a specific session
-      'org.matrix.cross_signing_reset',  // Reset cross-signing keys (identity reset)
+      'org.matrix.profile',
+      'org.matrix.sessions_list',
+      'org.matrix.session_view',
+      'org.matrix.session_end',
+      'org.matrix.cross_signing_reset',
     ],
-    // Device authorization endpoint for QR code login (MSC4108)
-    device_authorization_endpoint: `${baseUrl}/oauth/device`,
-    // Prompt values we support
-    prompt_values_supported: ['create'],
   };
 
   return c.json(response);
